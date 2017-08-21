@@ -1,5 +1,7 @@
 # rustbn.js
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ethereumjs/rustbn.js.svg)](https://greenkeeper.io/)
+
 Rust to Javascript compile of the [Parity fork](https://github.com/paritytech/bn) of the [Zcash bn
 pairing cryptography library](https://github.com/zcash/bn), implementing an efficient bilinear pairing on the Barreto-Naehrig (BN) curve. 
 

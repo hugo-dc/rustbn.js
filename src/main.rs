@@ -55,12 +55,6 @@ fn read_point(reader: &mut io::Chain<&[u8], io::Repeat>) -> Result<::bn::G1, Err
 #[no_mangle]
 pub fn ec_mul(input_hex_ptr: *const c_char) -> *const c_char {
         use bn::AffineG1;
-        use std::panic;
-
-        panic::set_hook(Box::new(|_| {
-            println!("Custom panic hook");
-        }));
-
 
 	let input_hex = unsafe { CStr::from_ptr(input_hex_ptr) };
 	let input_str: &str = input_hex.to_str().unwrap();
@@ -217,6 +211,13 @@ extern {
 
 
 fn main() {
+        use std::panic;
+
+        panic::set_hook(Box::new(|_| {
+            println!("Custom panic hook");
+        }));
+
+
 	unsafe {
 		emscripten_exit_with_live_runtime();
 	}

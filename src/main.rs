@@ -61,14 +61,19 @@ pub fn ec_mul(input_hex_ptr: *const c_char) -> *const c_char {
 	let input_parsed = FromHex::from_hex(input_str).unwrap();
 	let mut padded_input = input_parsed.chain(io::repeat(0));
 
-	let p1 = read_point(&mut padded_input).unwrap();
-	let fr = read_fr(&mut padded_input).unwrap();
-
 	let mut ecmul_output_buf = [0u8; 64];
-	if let Some(sum) = AffineG1::from_jacobian(p1 * fr) {
-		// point not at infinity
-		sum.x().to_big_endian(&mut ecmul_output_buf[0..32]).expect("Cannot fail since 0..32 is 32-byte length");
-		sum.y().to_big_endian(&mut ecmul_output_buf[32..64]).expect("Cannot fail since 32..64 is 32-byte length");;
+        match read_point(&mut padded_input) {
+		Ok(p) => {
+		    let p1 = p;
+		    let fr = read_fr(&mut padded_input).unwrap();
+
+		    if let Some(sum) = AffineG1::from_jacobian(p1 * fr) {
+                        // point not at infinity
+			sum.x().to_big_endian(&mut ecmul_output_buf[0..32]).expect("Cannot fail since 0..32 is 32-byte length");
+			sum.y().to_big_endian(&mut ecmul_output_buf[32..64]).expect("Cannot fail since 32..64 is 32-byte length");
+		    }		
+		},
+	    Err(_) => {}
 	}
 
 	let mut ec_mul_output_str = ecmul_output_buf.to_hex();

@@ -21,7 +21,6 @@ impl From<&'static str> for Error {
 	}
 }
 
-
 fn read_fr(reader: &mut io::Chain<&[u8], io::Repeat>) -> Result<::bn::Fr, Error> {
 	use bn::Fr;
 	let mut buf = [0u8; 32];
@@ -100,22 +99,30 @@ pub fn ec_add(input_hex_ptr: *const c_char) -> *const c_char {
 	let point2 = &padded_buf[64..128];
 
 	let mut point1_padded = point1.chain(io::repeat(0));
-	let mut point2_padded = point2.chain(io::repeat(0));
+        let mut point2_padded = point2.chain(io::repeat(0));
 
-	let p1 = read_point(&mut point1_padded).unwrap();
-	let p2 = read_point(&mut point2_padded).unwrap();
+        let mut point_correct = false;
 
-	let mut ecadd_output_buf = [0u8; 64];
-
-	if let Some(sum) = AffineG1::from_jacobian(p1 + p2) {
-		// point not at infinity
-		sum.x().to_big_endian(&mut ecadd_output_buf[0..32]).expect("Cannot fail since 0..32 is 32-byte length");
-		sum.y().to_big_endian(&mut ecadd_output_buf[32..64]).expect("Cannot fail since 32..64 is 32-byte length");;
-	}
-
-	let mut ec_add_output_str = ecadd_output_buf.to_hex();
-	ec_add_output_str.push_str("\0");
-	return ec_add_output_str.as_ptr()
+        match read_point(&mut point1_padded) {
+            Ok(p) => {
+                let p1 = p;
+                match read_point(&mut point2_padded) {
+                    Ok(p) => {
+                        let p2 = p;
+                        let mut ecadd_output_buf = [0u8; 64];
+                        if let Some(sum) = AffineG1:: from_jacobian(p1 + p2) {
+                            sum.x().to_big_endian(&mut ecadd_output_buf[0..32]).expect("Cannot fail since 0..32 is 32-byte length");
+		            sum.y().to_big_endian(&mut ecadd_output_buf[32..64]).expect("Cannot fail since 32..64 is 32-byte length");;
+                        }
+                        let mut ec_add_output_str = ecadd_output_buf.to_hex();
+	                ec_add_output_str.push_str("\0");
+	                return ec_add_output_str.as_ptr()
+                    },
+                    Err(_) => { return b"" as *const c_char}
+                }
+            },
+            Err(_) => { return b"" as *const c_char}
+        }
 }
 
 
@@ -131,8 +138,8 @@ pub fn ec_pairing(input_hex_ptr: *const c_char) -> *const c_char {
 
 	let elements = input.len() / 192;
 
-	if input.len() % 192 != 0 {
-		panic!("Invalid input length, must be multiple of 192 (3 * (32*2))");
+        if input.len() % 192 != 0 {
+                return b"" as *const c_char;
 	}
 
 	let ret_val = if input.len() == 0 {

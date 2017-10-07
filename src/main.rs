@@ -186,14 +186,20 @@ pub fn ec_pairing(input_hex_ptr: *const c_char) -> *const c_char {
 			*/
 
 			let fq2_x = Fq2::new(x2_r, x2_i);
-			let fq2_y = Fq2::new(y2_r, y2_i);
-
+		        let fq2_y = Fq2::new(y2_r, y2_i);
+                    
 			let g2_point;
 			if x2_r.is_zero() && x2_i.is_zero() && y2_r.is_zero() && y2_i.is_zero() {
 				g2_point = G2::zero();
 			} else {
-				let g2_affine_point = AffineG2::new(fq2_x, fq2_y).expect("Invalid b argument - not on curve");
-				g2_point = G2::from(g2_affine_point);
+                            match AffineG2::new(fq2_x, fq2_y) {
+                                Ok (ap) => {
+                                    let g2_affine_point = ap;
+                                    g2_point = G2::from(g2_affine_point);
+                                },
+                                Err(_) => { return b"" as *const c_char}
+                            }
+//				g2_point = G2::from(g2_affine_point);
 			}
 
 			vals.push((g1_point, g2_point));

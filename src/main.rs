@@ -71,14 +71,15 @@ pub fn ec_mul(input_hex_ptr: *const c_char) -> *const c_char {
                         // point not at infinity
 			sum.x().to_big_endian(&mut ecmul_output_buf[0..32]).expect("Cannot fail since 0..32 is 32-byte length");
 			sum.y().to_big_endian(&mut ecmul_output_buf[32..64]).expect("Cannot fail since 32..64 is 32-byte length");
-		    }		
+		    }
+                    let mut ec_mul_output_str = ecmul_output_buf.to_hex();
+	            ec_mul_output_str.push_str("\0");
+	            return ec_mul_output_str.as_ptr()
 		},
 	    Err(_) => {}
 	}
+        return b"" as *const c_char;
 
-	let mut ec_mul_output_str = ecmul_output_buf.to_hex();
-	ec_mul_output_str.push_str("\0");
-	return ec_mul_output_str.as_ptr()
 }
 
 

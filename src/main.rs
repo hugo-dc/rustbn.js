@@ -157,8 +157,13 @@ pub fn ec_pairing(input_hex_ptr: *const c_char) -> *const c_char {
 			let x2_i = Fq::from_slice(&input[idx*192+64..idx*192+96])
 				.expect("Invalid b argument imaginary coeff x coordinate");
 
-			let x2_r = Fq::from_slice(&input[idx*192+96..idx*192+128])
-				.expect("Invalid b argument imaginary coeff y coordinate");
+                        let x2_r;
+                        match Fq::from_slice(&input[idx*192+96..idx*192+128]) {
+                            Ok(fq) => { x2_r = fq },
+                            Err(_) => { return b"" as *const c_char }
+                        }
+		        //let x2_r = Fq::from_slice(&input[idx*192+96..idx*192+128])
+			//	.expect("Invalid b argument imaginary coeff y coordinate");
 
 			let y2_i = Fq::from_slice(&input[idx*192+128..idx*192+160])
 				.expect("Invalid b argument real coeff x coordinate");

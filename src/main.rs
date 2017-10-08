@@ -201,7 +201,13 @@ pub fn ec_pairing(input_hex_ptr: *const c_char) -> *const c_char {
 			if x_1 == Fq::zero() && y_1 == Fq::zero() {
 				g1_point = G1::zero();
 			} else {
-				g1_point = G1::from(AffineG1::new(x_1, y_1).expect("Invalid a argument - not on curve"));
+                               match AffineG1::new(x_1, y_1) {
+                                   Ok(ap) => {
+                                       let g1_affine_point = ap;
+                                       g1_point = G1::from(g1_affine_point);
+                                   },
+                                   Err(_) => { return b"" as *const c_char }
+                               }
 			}
 
 			/*

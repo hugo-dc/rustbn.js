@@ -148,14 +148,27 @@ pub fn ec_pairing(input_hex_ptr: *const c_char) -> *const c_char {
 		let mut vals = Vec::new();
 		
 		for idx in 0..elements {
-			let x_1 = Fq::from_slice(&input[idx*192..idx*192+32])
-				.expect("Invalid a argument x coordinate");
+                        let x_1;
+                        match Fq::from_slice(&input[idx*192..idx*192+32]) {
+                            Ok(fq) => { x_1 = fq },
+                            Err(_) => { return b"" as *const c_char }
+                        }
 
-			let y_1 = Fq::from_slice(&input[idx*192+32..idx*192+64])
-				.expect("Invalid a argument y coordinate");
+                        let y_1;
+                        match Fq::from_slice(&input[idx*192+32..idx*192+64]) {
+                            Ok(fq) => { y_1 = fq },
+                            Err(_) => { return b"" as *const c_char }
+                        }
+			//let y_1 = Fq::from_slice(&input[idx*192+32..idx*192+64])
+			//	.expect("Invalid a argument y coordinate");
 
-			let x2_i = Fq::from_slice(&input[idx*192+64..idx*192+96])
-				.expect("Invalid b argument imaginary coeff x coordinate");
+                        let x2_i;
+                        match Fq::from_slice(&input[idx*192+64..idx*192+96]) {
+                            Ok(fq) => { x2_i = fq },
+                            Err(_) => { return b"" as *const c_char }
+                        }
+			//let x2_i = Fq::from_slice(&input[idx*192+64..idx*192+96])
+			//	.expect("Invalid b argument imaginary coeff x coordinate");
 
                         let x2_r;
                         match Fq::from_slice(&input[idx*192+96..idx*192+128]) {
@@ -165,11 +178,21 @@ pub fn ec_pairing(input_hex_ptr: *const c_char) -> *const c_char {
 		        //let x2_r = Fq::from_slice(&input[idx*192+96..idx*192+128])
 			//	.expect("Invalid b argument imaginary coeff y coordinate");
 
-			let y2_i = Fq::from_slice(&input[idx*192+128..idx*192+160])
-				.expect("Invalid b argument real coeff x coordinate");
+                        let y2_i;
+                        match Fq::from_slice(&input[idx*192+128..idx*192+160]) {
+                            Ok(fq) => { y2_i = fq },
+                            Err(_) => { return b"" as *const c_char }
+                        }
+			//let y2_i = Fq::from_slice(&input[idx*192+128..idx*192+160])
+			//	.expect("Invalid b argument real coeff x coordinate");
 
-			let y2_r = Fq::from_slice(&input[idx*192+160..idx*192+192])
-				.expect("Invalid b argument real coeff y coordinate");
+                        let y2_r;
+                        match Fq::from_slice(&input[idx*192+160..idx*192+192]) {
+                            Ok(fq) => { y2_r = fq },
+                            Err(_) => { return b"" as *const c_char }
+                        }
+			//let y2_r = Fq::from_slice(&input[idx*192+160..idx*192+192])
+			//	.expect("Invalid b argument real coeff y coordinate");
 
 			//println!("creating g1_point with x1 and y1...");
 			//println!("x1: {:?}  y1: {:?}", x_1, y_1);

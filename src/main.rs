@@ -8,7 +8,7 @@ use std::os::raw::c_char;
 use rustc_hex::FromHex;
 use rustc_hex::ToHex;
 
-use bytes::BytesRef;
+//use bytes::BytesRef;
 
 #[no_mangle]
 pub fn ec_mul(input_hex_ptr: *const c_char) -> *const c_char {
@@ -16,8 +16,10 @@ pub fn ec_mul(input_hex_ptr: *const c_char) -> *const c_char {
     let input_str: &str = input_hex.to_str().unwrap();
     let input_parsed = FromHex::from_hex(input_str).unwrap();
 
-    let mut output = vec![0u8; 64];
-    match ethereum_bn128::bn128_mul(&input_parsed[..], &mut BytesRef::Fixed(&mut output[..])) {
+    //let mut output = vec![0u8; 64];
+    let mut output = [0u8;64];
+    // match ethereum_bn128::bn128_mul(&input_parsed[..], &mut BytesRef::Fixed(&mut output[..])) {
+    match ethereum_bn128::bn128_mul(&input_parsed[..], &mut output) {
         Ok(_) => {
             let mut output_hex = output.to_hex();
             output_hex.push_str("\0");
@@ -33,8 +35,10 @@ pub fn ec_add(input_hex_ptr: *const c_char) -> *const c_char {
     let input_str: &str = input_hex.to_str().unwrap();
     let input_parsed = FromHex::from_hex(input_str).unwrap();
 
-    let mut output = vec![0u8; 64];
-    match ethereum_bn128::bn128_add(&input_parsed[..], &mut BytesRef::Fixed(&mut output[..])) {
+    //let mut output = vec![0u8; 64];
+    //match ethereum_bn128::bn128_add(&input_parsed[..], &mut BytesRef::Fixed(&mut output[..])) {
+    let mut output = [0u8; 64];
+    match ethereum_bn128::bn128_add(&input_parsed[..], &mut output) {
         Ok(_) => {
             let mut output_hex = output.to_hex();
             output_hex.push_str("\0");
@@ -50,8 +54,10 @@ pub fn ec_pairing(input_hex_ptr: *const c_char) -> *const c_char {
     let input_str: &str = input_hex.to_str().unwrap();
     let input_parsed = FromHex::from_hex(input_str).unwrap();
 
-    let mut output = vec![0u8; 32];
-    match ethereum_bn128::bn128_pairing(&input_parsed[..], &mut BytesRef::Fixed(&mut output[..])) {
+    //let mut output = vec![0u8; 32];
+    //match ethereum_bn128::bn128_pairing(&input_parsed[..], &mut BytesRef::Fixed(&mut output[..])) {
+    let mut output = [0u8; 32];
+    match ethereum_bn128::bn128_pairing(&input_parsed[..], &mut output) {
         Ok(_) => {
             let mut output_hex = output.to_hex();
             output_hex.push_str("\0");
